@@ -3,6 +3,8 @@
 #define PERSONNEL_MANAGEMENT_H_
 
 #include <string>
+
+#include "./asset.h"
 class PersonnelManagement {
  private:
     PersonnelManagement();

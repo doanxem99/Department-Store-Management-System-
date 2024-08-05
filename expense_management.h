@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include "./asset.h"
+
 class ExpenseManagement {
  private:
     void calculateTax();    // Calculate tax for personnel

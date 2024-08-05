@@ -8,6 +8,7 @@
 #include "./product_management.h"
 #include "./expense_management.h"
 #include "./personnel_management.h"
+#include "./asset.h"
 
 void logIn();
 void signUp();

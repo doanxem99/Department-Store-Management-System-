@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "./asset.h"
+
 class ProductManagement {
  private:
     ProductManagement();
