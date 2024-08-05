@@ -5,9 +5,6 @@
 #include <vector>
 #include <string>
 
-#include "./personnel_management.h"
-#include "./product_management.h"
-
 class ExpenseManagement {
  private:
     void calculateTax();    // Calculate tax for personnel
