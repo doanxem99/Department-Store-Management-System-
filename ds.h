@@ -1,8 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-template <typename T>
-class Tree
+template <typename T> class Tree
 {
 private:
     struct Node
@@ -165,7 +164,7 @@ private:
     	delete root;
     }
     
-    void print_tree(Node* root, int h = 0)  // inorder traversal
+    void print_tree(Node* root)  // inorder traversal
     {
         if (root != nullptr)
         {
@@ -227,7 +226,7 @@ public:
         std::cout << '\n';
     }
 
-    void export_to_file(ofstream& fout, void (*print_line_to_file)(ofstream&, T))
+    void export_to_file(std::ofstream& fout, void (*print_line_to_file)(ofstream&, T))
     {
         export_tree_to_file(root, fout, print_line_to_file);
     }
