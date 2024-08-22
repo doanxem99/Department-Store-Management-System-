@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 template <typename T>
 class Tree
@@ -174,13 +175,13 @@ private:
         }
     }
 
-    void export_tree_to_file(Node* root, ofstream& fout, void (*print_line_to_file)(ofstream&, T))
+    void export_tree_to_file(Node* root, std::ofstream& fout, void (*print_line_to_file)(ofstream&, T))
     {
         if (root != nullptr)
         {
-            print_tree(root->left, h + 1);
+            export_tree_to_file(root->left, fout, print_line_to_file);
             print_line_to_file(fout, root->key);
-            print_tree(root->right, h + 1);
+            export_tree_to_file(root->right, fout, print_line_to_file);
         }
     }
     
