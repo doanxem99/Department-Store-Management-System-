@@ -2,51 +2,87 @@
 #ifndef PERSONNEL_MANAGEMENT_H_
 #define PERSONNEL_MANAGEMENT_H_
 
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <string>
 
 #include "./asset.h"
+#include "./ds.h"
+
+const int id_w = 5;
+const int name_w = 20;
+const int dept_w = 15;
+const int rank_w = 10;
+const int pos_w = 30;
+const int task_w = 80;
+
 class PersonnelManagement {
  private:
-    PersonnelManagement();
-    ~PersonnelManagement();
-    void addPersonnel();
-    bool removePersonnel();
-    bool updatePersonnel();
-    void listPersonnel();       // List all personnel in the
-                                //  system in a tree-like structure
-    bool searchPersonnel();     //  Search for a personnel by name, ID, etc.
-                                //  by using Hash Table or Binary Search Tree
-    void sortPersonnel();  // Sort personnel by name, ID, etc.
-                           // by using Quick Sort, Merge Sort, etc.
+    static bool ID_in_use[50];  // Assuming that the number of personnels won't exceed 50
+    
+    int first_unused_ID();      // "Generate" ID for new personnel
+    void importPersonnel();
+    void exportPersonnel();
 
-    void scheduleWork();  // Schedule work for personnel
-    void assignTask();  // Assign task to personnel
-    void updateTask();  // Update task for personnel
-    void listTask();  // List all tasks in the system in a table-like structure
+    // input of these functions should be the position
+    void addPersonnel(std::string position);
+    bool removePersonnel(std::string position);
+    bool updatePersonnel(std::string position);
+    void printPersonnel(std::string position);   // List all personnel in the system
 
-    void reportByUser();    // Report by user when they want to
-                            // change salary, work hour, etc.
+    bool searchPersonnel(std::string position); // Search for a personnel by name, ID, etc.
+                                                // by using Hash Table or Binary Search Tree
+
+    void assignTask(std::string position);      // Assign task to personnel
+    void listTask();                            // List all tasks in the system
+
+    // void reportByUser(int ID);                  // Report by user when they want to
+                                                // change salary, work hour, etc.
+
  public:
     struct Personnel {
+        int ID;
         std::string name;
-        std::string ID;
         std::string address;
         std::string phone;
         std::string email;
-        std::string position;
         std::string department;
-        std::string task;
-        std::string work;
+        std::string rank;       // including "staff" < "manager" < "owner"
+        std::string position;   // for example: janitor, cashier, security,...
+        std::string task;       // for example: cleaning warehouse, nighttime security, daytime security...
         int salary;
-        std::string currency;  // default is USD
-        int workHour;
-        int extraHour;
-        int totalHour;
+        std::string currency;   // default is USD
+
+        bool operator > (const Personnel &p)
+        {
+            return (ID > p.ID);
+        }
+        
+        bool operator < (const Personnel &p)
+        {
+            return (ID < p.ID);
+        }
+
+        bool operator == (const Personnel &p)
+        {
+            return (ID == p.ID);
+        }
+        
+        friend std::ostream& operator << (std::ostream& os, const Personnel& p)
+        {
+            os << std::left << std::setfill(' ');
+            os << std::setw(id_w) << p.ID << std::setw(name_w) << p.name << std::setw(dept_w) << p.department
+                << std::setw(rank_w) << p.rank << std::setw(pos_w) << p.position << std::setw(task_w) << p.task;
+            return os;
+        }
     };
 
+    PersonnelManagement();
+    ~PersonnelManagement();
 
     // Step-by-step for personnel management when user choose this option
-    void stepbystepForPersonnelManagement();
+    void stepbystepForPersonnelManagement(int ID, std::string rank);
 
     // calculate salary is decided by expense management
 };
