@@ -169,9 +169,9 @@ private:
     {
         if (root != nullptr)
         {
-            print_tree(root->left, h + 1);
+            print_tree(root->left);
             std::cout << root->key << '\n';
-            print_tree(root->right, h + 1);
+            print_tree(root->right);
         }
     }
 
