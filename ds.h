@@ -223,7 +223,6 @@ public:
     void print()
     {
         print_tree(root);
-        std::cout << '\n';
     }
 
     void export_to_file(std::ofstream& fout, void (*print_line_to_file)(std::ofstream&, T))
