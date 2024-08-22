@@ -59,13 +59,13 @@ private:
     Node* rebalance(Node* node)
     {
     	int diff = height_diff(node);
-    	if (diff > 1 && height_diff(node->left) > -1)//case LL
+    	if (diff > 1 && height_diff(node->left) > -1)   //case LL
     		return right_rotate(node);
-    	if (diff < -1 && height_diff(node->right) < 1)//case RR
+    	if (diff < -1 && height_diff(node->right) < 1)  //case RR
             return left_rotate(node);
-        if (diff > 1 && height_diff(node->left) < 0)//case LR
+        if (diff > 1 && height_diff(node->left) < 0)    //case LR
         	return double_right_rotate(node);
-        if (diff < -1 && height_diff(node->right) > 0)//case RL
+        if (diff < -1 && height_diff(node->right) > 0)  //case RL
         	return double_left_rotate(node);
         return node;
     }
@@ -164,26 +164,35 @@ private:
     	delete root;
     }
     
-    void print_tree(Node* root, int h = 0)//for debug only
+    void print_tree(Node* root, int h = 0)  // inorder traversal
     {
-        if (root == nullptr)
+        if (root != nullptr)
         {
-            for (int i = 0; i < h; i++)
-                std::cout << "   ";
-            std::cout << "*  " << '\n';
-            return;
+            print_tree(root->left, h + 1);
+            std::cout << root->key << '\n';
+            print_tree(root->right, h + 1);
         }
-        print_tree(root->right, h + 1);
-        for (int i = 0; i < h; i++)
-            std::cout << "   ";
-        std::cout << root->key << '\n';
-        print_tree(root->left, h + 1);
+    }
+
+    void export_tree_to_file(Node* root, ofstream& fout, void (*print_line_to_file)(ofstream&, T))
+    {
+        if (root != nullptr)
+        {
+            print_tree(root->left, h + 1);
+            print_line_to_file(fout, root->key);
+            print_tree(root->right, h + 1);
+        }
     }
     
 public:
     Tree()
     {
         root = nullptr;
+    }
+
+    ~Tree()
+    {
+        delete_tree(root);
     }
     
     void insert(T key)
@@ -205,15 +214,20 @@ public:
     {
         update_node(root, key);
     }
+
+    bool is_empty()
+    {
+        return (root == nullptr);
+    }
     
     void print()
     {
         print_tree(root);
         std::cout << '\n';
     }
-    
-    ~Tree()
+
+    void export_to_file(ofstream& fout, void (*print_line_to_file)(ofstream&, T))
     {
-        delete_tree(root);
+        export_tree_to_file(root, fout, print_line_to_file);
     }
 };
