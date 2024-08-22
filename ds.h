@@ -174,7 +174,7 @@ private:
         }
     }
 
-    void export_tree_to_file(Node* root, std::ofstream& fout, void (*print_line_to_file)(ofstream&, T))
+    void export_tree_to_file(Node* root, std::ofstream& fout, void (*print_line_to_file)(std::ofstream&, T))
     {
         if (root != nullptr)
         {
@@ -226,7 +226,7 @@ public:
         std::cout << '\n';
     }
 
-    void export_to_file(std::ofstream& fout, void (*print_line_to_file)(ofstream&, T))
+    void export_to_file(std::ofstream& fout, void (*print_line_to_file)(std::ofstream&, T))
     {
         export_tree_to_file(root, fout, print_line_to_file);
     }
