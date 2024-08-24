@@ -2,10 +2,10 @@
 #ifndef PRODUCT_MANAGEMENT_H_
 #define PRODUCT_MANAGEMENT_H_
 
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <vector>
-
-#include "./asset.h"
 
 struct Product {
     std::string name;
@@ -18,45 +18,6 @@ struct Product {
                                 //, non-food -> electronics -> phone
     unsigned int quantity;
     std::string supplier;
-};
-
-class ProductManagement {
- private:
-    ProductManagement();
-    ~ProductManagement();
-    void addProduct();  // Information is about the product name, ID,
-                        //  price, quantity, expiration date, etc.
-    bool removeProduct();
-    bool updateProduct();
-    void listProduct();     // List all products in the system
-                            // in a tree-like structure
-
-    bool searchProduct();   // Search for a product by name, ID, etc.
-                            // by using Hash Table or Binary Search Tree
-
-    void sortProduct();     // Sort products by name, ID, etc.
-                            // by using Quick Sort, Merge Sort, etc.
-
-    bool warnProduct();     // Warn the user when the product is out
-                            // of stock or the product is about to expire
-
-    bool listExpiredProduct();  // List all expired products in the system
-
-    bool listOutOfStockProduct();   // List all out-of-stock
-                                    // products in the system
-
-    void ongoingOrder();    // List all ongoing orders in the system
-
-    void completedOrder();  // List all completed orders in the system
-
-    void reportByUser();    // Report by user when they want to
-                            // annouce something about the product
-
- public:
-    // Step-by-step for product management when user choose this option
-    void stepbystepForProductManagement();
-
-    // add Supplier and remove Supplier is decided by expense management
 };
 
 #define LEFT	0
@@ -80,6 +41,50 @@ struct Category {
 	std::string name;
 	std::vector<std::string> list;
 	std::vector<Category*> child;
+};
+
+static Node_List *nl0 = nullptr;
+
+class ProductManagement {
+ public:
+ 	// ProductManagement();
+    // ~ProductManagement();
+
+    void addProduct(const std::string&, size_t, float, unsigned int,		// Information is about the product name, ID,
+                    unsigned int expirationDate, float, const std::string&,	//  price, quantity, expiration date, etc.
+                    const std::vector<std::string>&, const std::string&);
+
+    bool removeProduct(size_t);
+    bool updateProduct(size_t, unsigned int, const std::string&,
+					float, int, float, const std::string&,
+                    const std::vector<std::string>&, const std::string&);
+    void listProduct();			     			// List all products in the system
+                            					// in a tree-like structure
+
+    bool searchProduct(size_t);   				// Search for a product by name, ID, etc.
+    bool searchProduct(const std::string&);		// by using Hash Table or Binary Search Tree
+
+    void sortProduct();     // Sort products by name, ID, etc.
+                            // by using Quick Sort, Merge Sort, etc.
+
+    bool warnProduct(size_t);		 			// Warn the user when the product is out
+    bool warnProduct(const Product&);          	// of stock or the product is about to expire
+
+    bool listExpiredProduct();  				// List all expired products in the system
+
+    bool listOutOfStockProduct();   			// List all out-of-stock
+                                    			// products in the system
+
+    // void ongoingOrder();    // List all ongoing orders in the system
+
+    // void completedOrder();  // List all completed orders in the system
+
+    // void reportByUser();    // Report by user when they want to
+                            // annouce something about the product
+    // Step-by-step for product management when user choose this option
+    void stepbystepForProductManagement();
+
+    // add Supplier and remove Supplier is decided by expense management
 };
 
 Node *node_new(const Product &prod) {
@@ -214,7 +219,7 @@ Node *node_remove(Node *node, size_t id, size_t *deleted_id) {
 Product *node_get(Node *node, size_t id) {
 	Node *iter = node;
 	while (iter != nullptr) {
-		if (iter->prod.id == id) {
+		if (iter->prod.id == id && iter->prod.quantity > 0) {
 			return &iter->prod;
 		}
 
@@ -225,12 +230,29 @@ Product *node_get(Node *node, size_t id) {
 	return nullptr;
 }
 
+Product *node_get_from_name(Node *node, const std::string& name) {
+	if (node == nullptr) {
+		return nullptr;
+	}
+
+	if (node->prod.name == name) {
+		return &node->prod;
+	}
+
+	Product *prod = node_get_from_name(node->child[LEFT], name);
+	if (prod != nullptr) {
+		return prod;
+	}
+
+	return node_get_from_name(node->child[RIGHT], name);
+}
+
 void print_node_nlr(Node *node) {
 	if (node == nullptr) {
 		return;
 	}
 
-	printf("%s - %ld -> %d (%ld)\n", node->prod.name.c_str(), node->prod.id, node->prod.quantity, node->height);
+	std::cout << node->prod.name << " - " << node->prod.id << " -> " << node->prod.quantity << "(" << node->height << ")\n";
 	print_node_nlr(node->child[LEFT]);
 	print_node_nlr(node->child[RIGHT]);
 }
@@ -240,14 +262,14 @@ void print_node_tree(const Node *node, unsigned int space) {
 		return;
 	}
 
-	printf("%s(%ld)\n", node->prod.name.c_str(), node->prod.id);
+	std::cout << node->prod.name << "(" << node->prod.id << ")\n";
 	if (node->child[RIGHT] != NULL) {
-		printf("%*s|-> ", space, "");
+		std::cout << std::string(" ", space) << "|-> ";
 		print_node_tree(node->child[RIGHT], space + 4);
 	}
 
 	if (node->child[LEFT] != NULL) {
-		printf("%*s\\__ ", space, "");
+		std::cout << std::string(" ", space) << "\\__ ";
 		print_node_tree(node->child[LEFT], space + 4);
 	}
 }
@@ -299,14 +321,30 @@ void nlist_link(Node_List *&node_list, Node_List *next) {
 	iter->next = next;
 }
 
-Product *nlist_get(Node_List *node_list, size_t id) {
+Product *nlist_get(Node_List *node_list, size_t id, size_t start = 0, size_t end = 1000000000) {
 	Node_List *iter = node_list;
-	while (iter != nullptr) {
+	while (iter != nullptr && iter->expirationDate < start) {
+		iter = iter->next;
+	}
+	while (iter != nullptr && iter->expirationDate <= end) {
 		if (id >= iter->minId && id <= iter->maxId) {
 			Product *prod = node_get(iter->root, id);
 			if (prod != nullptr) {
 				return prod;
 			}
+		}
+		iter = iter->next;
+	}
+
+	return nullptr;
+}
+
+Product *nlist_get_from_name(Node_List *node_list, const std::string &name) {
+	Node_List *iter = node_list;
+	while (iter != nullptr) {
+		Product *prod = node_get_from_name(iter->root, name);
+		if (prod != nullptr) {
+			return prod;
 		}
 		iter = iter->next;
 	}
@@ -355,7 +393,8 @@ void nlist_insert(Node_List *&node_list, const Product &prod, unsigned int expir
 	iter->next = next;
 }
 
-void nlist_remove_range(Node_List *&node_list, size_t id, size_t start = 0, size_t end = 1000000000) {
+bool nlist_remove_range(Node_List *&node_list, size_t id, size_t start = 0, size_t end = 1000000000) {
+	bool found = false;
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
 		iter = iter->next;
@@ -375,10 +414,13 @@ void nlist_remove_range(Node_List *&node_list, size_t id, size_t start = 0, size
 				if (iter->minId > iter->maxId || iter->maxId == 0) {
 					iter->minId = iter->maxId = 0;
 				}
+				found = true;
 			}
 			iter = iter->next;
 		}
 	}
+
+	return found;
 }
 
 void category_insert(Category *c, const std::string &name, const std::vector<std::string> &list) {
@@ -429,6 +471,12 @@ void category_delete(Category *cate) {
 		category_delete(child);
 	}
 	delete cate;
+}
+
+static unsigned int getToday() {
+	time_t t = std::time(0);
+	std::tm *today = localtime(&t);
+	return (today->tm_year+1900)*10000 + (today->tm_mon+1)*100 + today->tm_mday;
 }
 
 #endif  // PRODUCT_MANAGEMENT_H_
