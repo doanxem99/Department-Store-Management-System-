@@ -204,7 +204,7 @@ bool ProductManagement::listOutOfStockProduct() {
 
 void ProductManagement::stepbystepForProductManagement() {
 	while (true) {
-		std::cout << "\t\t\tPERSONNEL MANAGEMENT\n";
+		std::cout << "\t\t\PRODUCT MANAGEMENT\n";
 	    std::cout << "1. Add a product\n";
 	    std::cout << "2. Remove a product\n";
 	    std::cout << "3. Update product\n";

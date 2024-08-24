@@ -20,8 +20,12 @@ struct Product {
     std::string supplier;
 };
 
-#define LEFT	0
-#define RIGHT	1
+#define LEFT		0
+#define RIGHT		1
+#define RANGE_END	1000000000
+#define RANGE_START 0
+
+
 struct Node {
 	Product prod;
 	size_t height;
@@ -44,11 +48,14 @@ struct Category {
 };
 
 static Node_List *nl0 = nullptr;
+void nlist_delete_range(Node_List*&, size_t, size_t);
 
 class ProductManagement {
  public:
  	// ProductManagement();
-    // ~ProductManagement();
+    ~ProductManagement() {
+		nlist_delete_range(nl0, RANGE_END, RANGE_START);
+	}
 
  	void addProduct (unsigned int, const Product&);
     void addProduct(const std::string&, size_t, float, unsigned int,		// Information is about the product name, ID,
@@ -292,7 +299,7 @@ void nlist_delete(Node_List *&node_list) {
 	delete node_list;
 }
 
-void nlist_delete_range(Node_List *&node_list, size_t end = 1000000000, size_t start = 0) {
+void nlist_delete_range(Node_List *&node_list, size_t end = RANGE_END, size_t start = RANGE_START) {
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
 		iter = iter->next;
@@ -322,7 +329,7 @@ void nlist_link(Node_List *&node_list, Node_List *next) {
 	iter->next = next;
 }
 
-Product *nlist_get(Node_List *node_list, size_t id, size_t end = 1000000000, size_t start = 0) {
+Product *nlist_get(Node_List *node_list, size_t id, size_t end = RANGE_END, size_t start = RANGE_START) {
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
 		iter = iter->next;
@@ -340,7 +347,7 @@ Product *nlist_get(Node_List *node_list, size_t id, size_t end = 1000000000, siz
 	return nullptr;
 }
 
-Product *nlist_get_from_name(Node_List *node_list, const std::string &name, size_t end = 1000000000, size_t start = 0) {
+Product *nlist_get_from_name(Node_List *node_list, const std::string &name, size_t end = RANGE_END, size_t start = RANGE_START) {
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
 		iter = iter->next;
@@ -397,7 +404,7 @@ void nlist_insert(Node_List *&node_list, const Product &prod, unsigned int expir
 	iter->next = next;
 }
 
-bool nlist_remove_range(Node_List *&node_list, size_t id, size_t end = 1000000000, size_t start = 0) {
+bool nlist_remove_range(Node_List *&node_list, size_t id, size_t end = RANGE_END, size_t start = RANGE_START) {
 	bool found = false;
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
