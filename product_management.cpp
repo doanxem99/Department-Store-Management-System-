@@ -46,6 +46,72 @@ bool ProductManagement::searchProduct(const std::string &name) {
 	return nlist_get_from_name(nl0, name) != nullptr;
 }
 
+void product_push_back(Node *node, std::vector<Product*> &list) {
+	if (node == nullptr) {
+		return;
+	}
+	product_push_back(node->child[LEFT], list);
+	list.push_back(&node->prod);
+	product_push_back(node->child[RIGHT], list);
+}
+
+void merge(std::vector<Product*> &list, size_t l, size_t m, size_t r, Product **L, Product **R)
+{
+    size_t n1 = m - l + 1;
+    size_t n2 = r - m;
+
+    for (size_t i = 0; i < n1; i++) {
+        L[i] = list[l + i];
+    }
+    for (size_t i = 0; i < n2; i++)
+        R[i] = list[m + 1 + i];
+
+    size_t i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i]->id <= R[j]->id) {
+            list[k] = L[i++];
+        }
+        else {
+            list[k] = R[j++];
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        list[k++] = L[i++];
+    }
+
+    while (j < n2) {
+        list[k++] = R[j++];
+    }
+}
+
+void ProductManagement::sortProduct(std::vector<Product*> &list) {
+	std::vector<unsigned int> idx;
+	Node_List *iter = nl0;
+	size_t start_idx = 0;
+	while (iter != nullptr) {
+		idx.push_back(start_idx);
+		start_idx += iter->count;
+		product_push_back(iter->root, list);
+		iter = iter->next;
+	}
+	idx.push_back(start_idx);
+
+	Product **L = new Product*[list.size()/2];
+    Product **R = new Product*[list.size()/2];
+	size_t step = 1;
+	while (step <= idx.size()/2) {
+		for (size_t i = 0; i < idx.size() - step*(i+2); i += step*2) {
+			merge(list, idx[step*i], idx[step*(i+1)], idx[step*(i+2)], L, R);
+		}
+		step *= 2;
+	}
+
+	delete[] L;
+	delete[] R;
+}
+
 bool ProductManagement::warnProduct(const Product& prod) {
 	return prod.quantity > 0;
 }

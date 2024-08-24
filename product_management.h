@@ -64,8 +64,8 @@ class ProductManagement {
     bool searchProduct(size_t);   				// Search for a product by name, ID, etc.
     bool searchProduct(const std::string&);		// by using Hash Table or Binary Search Tree
 
-    void sortProduct();     // Sort products by name, ID, etc.
-                            // by using Quick Sort, Merge Sort, etc.
+    void sortProduct(std::vector<Product*>&);   // Sort products by name, ID, etc.
+                            					// by using Quick Sort, Merge Sort, etc.
 
     bool warnProduct(size_t);		 			// Warn the user when the product is out
     bool warnProduct(const Product&);          	// of stock or the product is about to expire
