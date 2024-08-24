@@ -3,16 +3,10 @@
 void ProductManagement::addProduct(const std::string &name, size_t id, float entryPrice, unsigned int quantity,
                     unsigned int expirationDate, float sellingPrice = 0, const std::string &currency = "USD",
                     const std::vector<std::string> &category = {}, const std::string &supplier = "") {
-	nlist_insert(nl0, Product{
-		.name = name,
-        .id = id,
-        .entryPrice = entryPrice,
-        .sellingPrice = sellingPrice != 0.0f ? sellingPrice : entryPrice,
-        .currency = currency,
-        .category = category,
-        .quantity = quantity,
-        .supplier = supplier,
-	}, expirationDate);
+	nlist_insert(nl0, Product{ name, id,
+		        entryPrice, sellingPrice != 0.0f ? sellingPrice : entryPrice,
+		        currency, category, quantity, supplier,
+				}, expirationDate);
 }
 
 void ProductManagement::addProduct(unsigned int expirationDate, const Product &prod) {
