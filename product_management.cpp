@@ -1,7 +1,7 @@
 #include "product_management.h"
 
 void ProductManagement::addProduct(const std::string &name, size_t id, float entryPrice, unsigned int quantity,
-                    unsigned int expirationDate = getToday(), float sellingPrice = 0, const std::string &currency = "USD",
+                    unsigned int expirationDate, float sellingPrice = 0, const std::string &currency = "USD",
                     const std::vector<std::string> &category = {}, const std::string &supplier = "") {
 	nlist_insert(nl0, Product{
 		.name = name,
@@ -15,6 +15,10 @@ void ProductManagement::addProduct(const std::string &name, size_t id, float ent
 	}, expirationDate);
 }
 
+void ProductManagement::addProduct(unsigned int expirationDate, const Product &prod) {
+	nlist_insert(nl0, prod, expirationDate);
+}
+
 bool ProductManagement::removeProduct(size_t id) {
 	return nlist_remove_range(nl0, id);
 }
@@ -23,7 +27,7 @@ bool ProductManagement::updateProduct(size_t id, unsigned int expirationDate, co
 					float entryPrice = -1, int quantity = -1,
                     float sellingPrice = -1, const std::string &currency = "",
                     const std::vector<std::string> &category = {}, const std::string &supplier = "") {
-	Product *prod = nlist_get(nl0, id, expirationDate, expirationDate+1);
+	Product *prod = nlist_get(nl0, id, expirationDate+1, expirationDate);
 	if (prod == nullptr) {
 		return false;
 	}
@@ -117,7 +121,7 @@ bool ProductManagement::warnProduct(const Product& prod) {
 }
 
 bool ProductManagement::warnProduct(size_t id) {
-	Product *prod = nlist_get(nl0, id);
+	Product *prod = nlist_get(nl0, id, 1000000000, getToday());
 	if (prod == nullptr) {
 		return false;
 	}
@@ -196,4 +200,158 @@ bool ProductManagement::listOutOfStockProduct() {
 	}
 
 	return true;
+}
+
+void ProductManagement::stepbystepForProductManagement() {
+	while (true) {
+		std::cout << "\t\t\tPERSONNEL MANAGEMENT\n";
+	    std::cout << "1. Add a product\n";
+	    std::cout << "2. Remove a product\n";
+	    std::cout << "3. Update product\n";
+	    std::cout << "4. Print a list of products\n";
+	    std::cout << "5. Print a list of expired products\n";
+	    std::cout << "6. Print a list of out of stock products\n";
+	    std::cout << "7. Search for a product\n";
+	    std::cout << "8. Exit\n\n";
+
+	    int choice = 0;
+	    do {
+	    	std::cout << "Your choice: ";
+	    	std::cin >> choice;
+	    } while (choice < 1 || choice > 8);
+
+	    if (choice == 1) {
+	    	Product prod;
+	    	std::cout << "Name: ";
+	    	std::getline(std::cin, prod.name);
+	    	std::cout << "Id: ";
+	    	std::cin >> prod.id;
+	    	std::cout << "Entry price: ";
+	    	std::cin >> prod.entryPrice;
+	    	std::cout << "Quantity: ";
+	    	std::cin >> prod.quantity;
+	    	std::cout << "Expiration date: ";
+	    	unsigned int expirationDate = 0;
+	    	std::cin >> expirationDate;
+	    	std::cout << "Selling price (press ENTER to set default is" << prod.entryPrice << " ): ";
+	    	std::cin >> prod.sellingPrice;
+	    	std::cout << "Currency (press ENTER to set default is USD): ";
+	    	std::cin >> prod.currency;
+	    	std::cout << "Category (leave empty and press ENTER to stop)\n";
+	    	std::string category = " ";
+	    	do {
+	    		std::getline(std::cin, category);
+	    		if (category.size() > 0) {
+	    			prod.category.push_back(category);
+	    		}
+	    	} while (category.size() > 0);
+
+	    	std::cout << "Supplier (press ENTER to skip): ";
+	    	std::cin >> prod.supplier;
+	    	addProduct(expirationDate, prod);
+	    }
+	    else if (choice == 2) {
+	    	std::cout << "Id: ";
+	    	size_t id = 0;
+	    	std::cin >> id;
+	    	if (removeProduct(id)) {
+	    		std::cout << "Remove product success\n";
+	    	}
+	    	else {
+	    		std::cout << "Failed to remove, product not found\n";
+	    	}
+	    }
+	    else if (choice == 3) {
+	    	int info_choice = 0;
+	    	std::cout << "Id: ";
+	    	size_t id = 0;
+	    	std::cin >> id;
+	    	std::cout << "Range start (format yyyymmdd or leave empty to search from beginning): ";
+	    	unsigned int range_start = 0;
+	    	std::cin >> range_start;
+	    	std::cout << "Range end (format yyyymmdd or leave empty to search to the last): ";
+	    	unsigned int range_end = 0;
+	    	std::cin >> range_end;
+
+	    	do {
+	    		std::cout << "\t\t\t Which information you want to change:\n";
+	    		std::cout << "1. Name\n";
+	    		std::cout << "2. Selling price\n";
+	    		std::cout << "3. Quantity\n";
+	    		std::cout << "4. Exit\n";
+	    		std::cin >> info_choice;
+	    	} while (info_choice != 4);
+			std::string name;
+			float price = 0;
+			unsigned int quantity = 0;
+	    	if (info_choice == 1) {
+    			std::getline(std::cin, name);
+    		}
+    		else if (info_choice == 2) {
+    			std::cin >> price;
+    		}
+    		else if (info_choice == 3) {
+    			std::cin >> quantity;
+    		}
+	    	for (size_t i = range_start; i <= range_end; i++) {
+	    		Product *prod = nlist_get(nl0, id, i+1, i);
+	    		if (info_choice == 1) {
+	    			prod->name = name;
+	    		}
+	    		else if (info_choice == 2) {
+	    			prod->sellingPrice = price;
+	    		}
+	    		else if (info_choice == 3) {
+	    			prod->sellingPrice = quantity;
+	    		}
+	    	}
+	    }
+	    else if (choice == 4) {
+	    	listProduct();
+	    }
+	    else if (choice == 5) {
+	    	listExpiredProduct();
+	    }
+	    else if (choice == 6) {
+	    	listOutOfStockProduct();
+	    }
+	    else if (choice == 7) {
+	    	std::string info;
+	    	std::getline(std::cin, info);
+
+	    	bool is_number = true;
+	    	for (char c: info) {
+	    		if (c < '0' || c > '9') {
+	    			is_number = false;
+	    			break;
+	    		}
+	    	}
+
+	    	std::cout << "Range start (format yyyymmdd or leave empty to search from beginning): ";
+	    	unsigned int range_start = 0;
+	    	std::cin >> range_start;
+	    	std::cout << "Range end (format yyyymmdd or leave empty to search to the last): ";
+	    	unsigned int range_end = 0;
+	    	std::cin >> range_end;
+
+	    	bool exists = false;
+	    	if (is_number) {
+	    		size_t num = std::atoll(info.c_str());
+	    		exists = nlist_get(nl0, num, range_end, range_start);
+	    	}
+	    	else {
+	    		exists = nlist_get_from_name(nl0, info, range_end, range_start);
+	    	}
+
+	    	if (exists) {
+	    		std::cout << "Found\n";
+	    	}
+	    	else {
+	    		std::cout << "Not found\n";
+	    	}
+	    }
+	    else if (choice == 8) {
+	    	break;
+	    }
+	}
 }

@@ -50,6 +50,7 @@ class ProductManagement {
  	// ProductManagement();
     // ~ProductManagement();
 
+ 	void addProduct (unsigned int, const Product&);
     void addProduct(const std::string&, size_t, float, unsigned int,		// Information is about the product name, ID,
                     unsigned int expirationDate, float, const std::string&,	//  price, quantity, expiration date, etc.
                     const std::vector<std::string>&, const std::string&);
@@ -64,8 +65,8 @@ class ProductManagement {
     bool searchProduct(size_t);   				// Search for a product by name, ID, etc.
     bool searchProduct(const std::string&);		// by using Hash Table or Binary Search Tree
 
-    void sortProduct(std::vector<Product*>&);   // Sort products by name, ID, etc.
-                            					// by using Quick Sort, Merge Sort, etc.
+    void sortProduct(std::vector<Product*>&);     	// Sort products by name, ID, etc.
+                            							// by using Quick Sort, Merge Sort, etc.
 
     bool warnProduct(size_t);		 			// Warn the user when the product is out
     bool warnProduct(const Product&);          	// of stock or the product is about to expire
@@ -321,7 +322,7 @@ void nlist_link(Node_List *&node_list, Node_List *next) {
 	iter->next = next;
 }
 
-Product *nlist_get(Node_List *node_list, size_t id, size_t start = 0, size_t end = 1000000000) {
+Product *nlist_get(Node_List *node_list, size_t id, size_t end = 1000000000, size_t start = 0) {
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
 		iter = iter->next;
@@ -339,9 +340,12 @@ Product *nlist_get(Node_List *node_list, size_t id, size_t start = 0, size_t end
 	return nullptr;
 }
 
-Product *nlist_get_from_name(Node_List *node_list, const std::string &name) {
+Product *nlist_get_from_name(Node_List *node_list, const std::string &name, size_t end = 1000000000, size_t start = 0) {
 	Node_List *iter = node_list;
-	while (iter != nullptr) {
+	while (iter != nullptr && iter->expirationDate < start) {
+		iter = iter->next;
+	}
+	while (iter != nullptr && iter->expirationDate <= end) {
 		Product *prod = node_get_from_name(iter->root, name);
 		if (prod != nullptr) {
 			return prod;
@@ -393,7 +397,7 @@ void nlist_insert(Node_List *&node_list, const Product &prod, unsigned int expir
 	iter->next = next;
 }
 
-bool nlist_remove_range(Node_List *&node_list, size_t id, size_t start = 0, size_t end = 1000000000) {
+bool nlist_remove_range(Node_List *&node_list, size_t id, size_t end = 1000000000, size_t start = 0) {
 	bool found = false;
 	Node_List *iter = node_list;
 	while (iter != nullptr && iter->expirationDate < start) {
