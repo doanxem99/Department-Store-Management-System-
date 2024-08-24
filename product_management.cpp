@@ -156,7 +156,7 @@ void ProductManagement::listProduct() {
 		iter = iter->next;
 	}
 
-	category_print(cate_root);
+	category_print(cate_root, 0);
 	category_delete(cate_root);
 }
 

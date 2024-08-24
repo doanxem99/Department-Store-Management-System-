@@ -452,17 +452,18 @@ void category_insert(Category *c, const std::string &name, const std::vector<std
 	iter->list.push_back(name);
 }
 
-void category_print(const Category *cate) {
+void category_print(const Category *cate, int space) {
 	if (cate == nullptr) {
 		return;
 	}
 
-	printf("%s:", cate->name.c_str());
+	printf("%*s%s:", space, "", cate->name.c_str());
 	for (const std::string &prod_name: cate->list) {
 		printf("%s,", prod_name.c_str());
 	}
+	printf("\n");
 	for (const Category *child: cate->child) {
-		category_print(child);
+		category_print(child, space+4);
 	}
 }
 
