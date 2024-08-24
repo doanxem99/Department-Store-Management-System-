@@ -10,7 +10,7 @@
 
 class Asset {
  public:
-    static std::vector<PersonnelManagement::Personnel> personnelList;
+    static Tree<PersonnelManagement::Personnel> personnelTree;
     static std::vector<ProductManagement::Product> productList;
 
     // If there is any change in an app, add it to historyOfChanges
