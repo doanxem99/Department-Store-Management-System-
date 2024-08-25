@@ -1,0 +1,22 @@
+0 1
+0 0 0 0
+awdawddk
+USD
+
+1
+Uncategorized
+20240831 1
+123 1000 1000 30
+Potato
+USD
+
+1
+Food
+99999999 1
+333 200000 200000 20
+Fan
+VND
+
+2
+Non food
+Mechanics
