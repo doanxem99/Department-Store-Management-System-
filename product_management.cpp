@@ -685,15 +685,16 @@ bool ProductManagement::listOutOfStockProduct() {
 
 void ProductManagement::stepbystepForProductManagement() {
 	while (true) {
-		std::cout << "\t\t\PRODUCT MANAGEMENT\n";
+		std::cout << "\t\t\tPRODUCT MANAGEMENT\n";
 	    std::cout << "1. Add a product\n";
 	    std::cout << "2. Remove a product\n";
 	    std::cout << "3. Update product\n";
-	    std::cout << "4. Print a list of products\n";
-	    std::cout << "5. Print a list of expired products\n";
-	    std::cout << "6. Print a list of out of stock products\n";
-	    std::cout << "7. Search for a product\n";
-	    std::cout << "8. Exit\n\n";
+	    std::cout << "4. Print a list of products as tree-like\n";
+	    std::cout << "5. Print a list of products in increasingly id order\n";
+	    std::cout << "6. Print a list of expired products\n";
+	    std::cout << "7. Print a list of out of stock products\n";
+	    std::cout << "8. Search for a product\n";
+	    std::cout << "9. Exit\n\n";
 
 	    int choice = 0;
 	    do {
@@ -704,6 +705,7 @@ void ProductManagement::stepbystepForProductManagement() {
 	    if (choice == 1) {
 	    	Product prod;
 	    	std::cout << "Name: ";
+	    	std::cin.ignore();
 	    	std::getline(std::cin, prod.name);
 	    	std::cout << "Id: ";
 	    	std::cin >> prod.id;
@@ -719,7 +721,7 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	std::cin.ignore();
     		std::getline(std::cin, line);
     		if (line.size() == 0) {
-    			prod.sellingPrice = prod.entryPrice;
+    			prod.sellingPrice = prod.entryPrice*1.5f;
     		}
     		else {
     			prod.sellingPrice = atoi(line.c_str());
@@ -761,12 +763,26 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	std::cout << "Id: ";
 	    	size_t id = 0;
 	    	std::cin >> id;
+	    	std::cin.ignore();
+	    	std::string line;
 	    	std::cout << "Range start (format yyyymmdd or leave empty to search from beginning): ";
 	    	unsigned int range_start = 0;
-	    	std::cin >> range_start;
+	    	std::getline(std::cin, line);
+	    	if (line.size() == 0) {
+	    		range_start = RANGE_START;
+	    	}
+	    	else {
+	    		range_start = atoi(line.c_str());
+	    	}
 	    	std::cout << "Range end (format yyyymmdd or leave empty to search to the last): ";
 	    	unsigned int range_end = 0;
-	    	std::cin >> range_end;
+	    	std::getline(std::cin, line);
+	    	if (line.size() == 0) {
+	    		range_end = RANGE_END;
+	    	}
+	    	else {
+	    		range_end = atoi(line.c_str());
+	    	}
 
 	    	do {
 	    		std::cout << "\t\t\t Which information you want to change:\n";
@@ -780,6 +796,7 @@ void ProductManagement::stepbystepForProductManagement() {
 			float price = 0;
 			unsigned int quantity = 0;
 	    	if (info_choice == 1) {
+	    		std::cin.ignore();
     			std::getline(std::cin, name);
     		}
     		else if (info_choice == 2) {
@@ -805,13 +822,25 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	listProduct();
 	    }
 	    else if (choice == 5) {
-	    	listExpiredProduct();
+	    	std::vector<Product*> list;
+	    	sortProduct(list);
+	    	for (const Product* prod: list) {
+	    		std::cout << prod->name << "(" << prod->id << "), quantity: " << prod->quantity << ", category: [";
+	    		for (const std::string &category: prod->category) {
+	    			std::cout << category << ",";
+	    		}
+	    		std::cout << "]\n";
+	    	}
 	    }
 	    else if (choice == 6) {
-	    	listOutOfStockProduct();
+	    	listExpiredProduct();
 	    }
 	    else if (choice == 7) {
+	    	listOutOfStockProduct();
+	    }
+	    else if (choice == 8) {
 	    	std::string info;
+	    	std::cin.ignore();
 	    	std::getline(std::cin, info);
 
 	    	bool is_number = true;
@@ -822,12 +851,26 @@ void ProductManagement::stepbystepForProductManagement() {
 	    		}
 	    	}
 
+	    	std::cin.ignore();
+	    	std::string line;
 	    	std::cout << "Range start (format yyyymmdd or leave empty to search from beginning): ";
 	    	unsigned int range_start = 0;
-	    	std::cin >> range_start;
+	    	std::getline(std::cin, line);
+	    	if (line.size() == 0) {
+	    		range_start = RANGE_START;
+	    	}
+	    	else {
+	    		range_start = atoi(line.c_str());
+	    	}
 	    	std::cout << "Range end (format yyyymmdd or leave empty to search to the last): ";
 	    	unsigned int range_end = 0;
-	    	std::cin >> range_end;
+	    	std::getline(std::cin, line);
+	    	if (line.size() == 0) {
+	    		range_end = RANGE_END;
+	    	}
+	    	else {
+	    		range_end = atoi(line.c_str());
+	    	}
 
 	    	bool exists = false;
 	    	if (is_number) {
@@ -845,7 +888,7 @@ void ProductManagement::stepbystepForProductManagement() {
 	    		std::cout << "Not found\n";
 	    	}
 	    }
-	    else if (choice == 8) {
+	    else if (choice == 9) {
 	    	break;
 	    }
 	}
