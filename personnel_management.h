@@ -25,19 +25,19 @@ class PersonnelManagement {
     void importPersonnel();
     void exportPersonnel();
 
-    // input of these functions should be the position
-    void addPersonnel(std::string position);
-    bool removePersonnel(std::string position);
-    bool updatePersonnel(std::string position);
-    void printPersonnel(std::string position);   // List all personnel in the system
+    // input of these functions should be the rank
+    void addPersonnel(std::string rank);
+    bool removePersonnel(std::string rank);
+    bool updatePersonnel(std::string rank);
+    void printPersonnel(std::string rank);  // List all personnel in the system
 
-    bool searchPersonnel(std::string position); // Search for a personnel by name, ID, etc.
+    bool searchPersonnel(std::string rank); // Search for a personnel by name, ID, etc.
                                                 // by using Hash Table or Binary Search Tree
 
-    void assignTask(std::string position);      // Assign task to personnel
+    void assignTask(std::string rank);      // Assign task to personnel
     void listTask();                            // List all tasks in the system
 
-    // void reportByUser(int ID);                  // Report by user when they want to
+    // void reportByUser(int ID);               // Report by user when they want to
                                                 // change salary, work hour, etc.
 
  public:
