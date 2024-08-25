@@ -377,8 +377,8 @@ void category_print(const Category *cate, int space) {
 		for (const std::string &prod_name: cate->list) {
 			printf("%s,", prod_name.c_str());
 		}
-		printf("\n");
 	}
+	printf("\n");
 	for (const Category *child: cate->child) {
 		category_print(child, space);
 	}
@@ -715,7 +715,7 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	unsigned int expirationDate = 0;
 	    	std::cin >> expirationDate;
 	    	std::string line;
-	    	std::cout << "Selling price (press ENTER to set default is " << prod.entryPrice << " )\n";
+	    	std::cout << "Selling price (press ENTER to set default is " << prod.entryPrice << ")\n";
 	    	std::cin.ignore();
     		std::getline(std::cin, line);
     		if (line.size() == 0) {
@@ -739,7 +739,6 @@ void ProductManagement::stepbystepForProductManagement() {
 	    			prod.category.push_back(line);
 	    		}
 	    	} while (line.size() > 0);
-	    	std::cout << prod.category.size() << "\n";
 
 	    	std::cout << "Supplier (press ENTER to skip)\n";
 	    	std::getline(std::cin, line);
