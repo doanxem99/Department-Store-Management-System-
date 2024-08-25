@@ -3,6 +3,7 @@
 #define PRODUCT_MANAGEMENT_H_
 
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -52,12 +53,17 @@ void nlist_delete_range(Node_List*&, size_t, size_t);
 
 class ProductManagement {
  public:
- 	// ProductManagement();
+ 	void importProduct(const std::string &infile);
+ 	void exportProduct(const std::string &outfile);
+ 	ProductManagement() {
+		importProduct("product_list.txt");
+ 	}
     ~ProductManagement() {
-		nlist_delete_range(nl0, RANGE_END, RANGE_START);
-	}
+		exportProduct("product_list.txt");
+    	nlist_delete_range(nl0, RANGE_END, RANGE_START);
+    }
 
- 	void addProduct (unsigned int, const Product&);
+ 	void addProduct (unsigned int, Product);
     void addProduct(const std::string&, size_t, float, unsigned int,		// Information is about the product name, ID,
                     unsigned int expirationDate, float, const std::string&,	//  price, quantity, expiration date, etc.
                     const std::vector<std::string>&, const std::string&);

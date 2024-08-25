@@ -369,13 +369,18 @@ void category_print(const Category *cate, int space) {
 		return;
 	}
 
-	printf("%*s%s:", space, "", cate->name.c_str());
-	for (const std::string &prod_name: cate->list) {
-		printf("%s,", prod_name.c_str());
+	if (cate->name.size() > 0) {
+		printf("%*s%s: ", space, "", cate->name.c_str());
+		space += 4;
 	}
-	printf("\n");
+	if (cate->list.size() > 0) {
+		for (const std::string &prod_name: cate->list) {
+			printf("%s,", prod_name.c_str());
+		}
+		printf("\n");
+	}
 	for (const Category *child: cate->child) {
-		category_print(child, space+4);
+		category_print(child, space);
 	}
 }
 
@@ -390,16 +395,108 @@ void category_delete(Category *cate) {
 	delete cate;
 }
 
+void ProductManagement::importProduct(const std::string &infile) {
+	std::ifstream ifs(infile, std::ios::binary);
+	if (!ifs.is_open()) {
+		return;
+	}
+
+	while (!ifs.eof()) {
+		unsigned int expirationDate = 0;
+		size_t iter_count = 0;
+		ifs >> expirationDate >> iter_count;
+		Product prod;
+		while (iter_count-- > 0) {
+			ifs >> prod.id >> prod.entryPrice >> prod.sellingPrice >> prod.quantity;
+			ifs.ignore(2);
+			std::getline(ifs, prod.name);
+			while (prod.name.back() == '\r') {
+				prod.name.pop_back();
+			}
+			std::getline(ifs, prod.currency);
+			while (prod.currency.back() == '\r') {
+				prod.currency.pop_back();
+			}
+			std::getline(ifs, prod.supplier);
+			while (prod.supplier.back() == '\r') {
+				prod.supplier.pop_back();
+			}
+
+			size_t category_size = 0;
+			ifs >> category_size;
+			ifs.ignore(2);
+			while (category_size-- > 0) {
+				std::string category;
+				std::getline(ifs, category);
+				while (category.back() == '\r') {
+					category.pop_back();
+				}
+				prod.category.push_back(category);
+			}
+
+			addProduct(expirationDate, prod);
+		}
+	}
+}
+
+void ProductManagement::exportProduct(const std::string &oufile) {
+	std::ofstream ofs(oufile);
+	if (!ofs.is_open()) {
+		std::cout << "ERROR: could not export to " << oufile << "\n";
+		return;
+	}
+
+	Node_List *iter = nl0;
+	std::vector<Node*> queue;
+	while (iter != nullptr) {
+		while (iter->count == 0) {
+			iter = iter->next;
+		}
+		ofs << iter->expirationDate << " " << iter->count << "\n";
+		Node *root = iter->root;
+		if (root != nullptr) {
+			queue.push_back(root);
+		}
+		size_t queue_size = queue.size();
+		while (queue_size > 0) {
+			for (size_t i = 0; i < queue_size; i++) {
+				ofs << queue[i]->prod.id << " " << queue[i]->prod.entryPrice << " " << queue[i]->prod.sellingPrice << " "
+					<< queue[i]->prod.quantity << "\n"
+					<< queue[i]->prod.name << "\n"
+					<< queue[i]->prod.currency << "\n"
+					<< queue[i]->prod.supplier << "\n";
+
+				ofs << queue[i]->prod.category.size() << "\n";
+				for (const std::string &category: queue[i]->prod.category) {
+					ofs << category << "\n";
+				}
+				for (size_t j = 0; j < 2; j++) {
+					if (queue[i]->child[j] != nullptr) {
+						queue.push_back(queue[i]->child[j]);
+					}
+				}
+			}
+			queue.erase(queue.begin(), queue.begin() + queue_size);
+			queue_size = queue.size();
+		}
+		queue.clear();
+		iter = iter->next;
+	}
+}
+
 void ProductManagement::addProduct(const std::string &name, size_t id, float entryPrice, unsigned int quantity,
                     unsigned int expirationDate, float sellingPrice = 0, const std::string &currency = "USD",
                     const std::vector<std::string> &category = {}, const std::string &supplier = "") {
 	nlist_insert(nl0, Product{ name, id,
 		        entryPrice, sellingPrice != 0.0f ? sellingPrice : entryPrice,
-		        currency, category, quantity, supplier,
+		        currency, category.size() > 0 ? category : std::vector<std::string>{"Uncategorized"}, quantity, supplier,
 				}, expirationDate);
 }
 
 void ProductManagement::addProduct(unsigned int expirationDate, const Product &prod) {
+	if (prod.category.size() == 0) {
+		prod.category.push_back("Uncategorized");
+	}
 	nlist_insert(nl0, prod, expirationDate);
 }
 
@@ -617,21 +714,36 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	std::cout << "Expiration date: ";
 	    	unsigned int expirationDate = 0;
 	    	std::cin >> expirationDate;
-	    	std::cout << "Selling price (press ENTER to set default is" << prod.entryPrice << " ): ";
-	    	std::cin >> prod.sellingPrice;
-	    	std::cout << "Currency (press ENTER to set default is USD): ";
-	    	std::cin >> prod.currency;
+	    	std::string line;
+	    	std::cout << "Selling price (press ENTER to set default is " << prod.entryPrice << " )\n";
+	    	std::cin.ignore();
+    		std::getline(std::cin, line);
+    		if (line.size() == 0) {
+    			prod.sellingPrice = prod.entryPrice;
+    		}
+    		else {
+    			prod.sellingPrice = atoi(line.c_str());
+    		}
+	    	std::cout << "Currency (press ENTER to set default is USD)\n";
+    		std::getline(std::cin, line);
+    		if (line.size() == 0) {
+    			prod.currency = "USD";
+    		}
+    		else {
+    			prod.currency = line;
+    		}
 	    	std::cout << "Category (leave empty and press ENTER to stop)\n";
-	    	std::string category = " ";
 	    	do {
-	    		std::getline(std::cin, category);
-	    		if (category.size() > 0) {
-	    			prod.category.push_back(category);
+	    		std::getline(std::cin, line);
+	    		if (line.size() >= 3) {
+	    			prod.category.push_back(line);
 	    		}
-	    	} while (category.size() > 0);
+	    	} while (line.size() > 0);
+	    	std::cout << prod.category.size() << "\n";
 
-	    	std::cout << "Supplier (press ENTER to skip): ";
-	    	std::cin >> prod.supplier;
+	    	std::cout << "Supplier (press ENTER to skip)\n";
+	    	std::getline(std::cin, line);
+    		prod.supplier = line;
 	    	addProduct(expirationDate, prod);
 	    }
 	    else if (choice == 2) {
