@@ -1,3 +1,6 @@
+#ifndef DS_H_
+#define DS_H_
+
 #include <iostream>
 #include <fstream>
 
@@ -230,3 +233,5 @@ public:
         export_tree_to_file(root, fout, print_line_to_file);
     }
 };
+
+#endif  // DS_H_
