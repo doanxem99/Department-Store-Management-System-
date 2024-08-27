@@ -1,16 +1,10 @@
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <string>
-#include "./asset.h"
-#include "./ds.h"
 #include "./personnel_management.h"
 
-bool PersonnelManagement::ID_in_use[50] = {0};
+bool PersonnelManagement::ID_in_use[MAX_PERSONNELS] = {0};
 
 int PersonnelManagement::first_unused_ID()
 {
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i < MAX_PERSONNELS; ++i)
         if (!PersonnelManagement::ID_in_use[i])
             return i;
     return -1;  // In case all ID are used
