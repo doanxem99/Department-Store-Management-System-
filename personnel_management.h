@@ -10,12 +10,12 @@
 #include "./asset.h"
 #include "./ds.h"
 
-const int id_w = 5;
-const int name_w = 20;
-const int dept_w = 15;
-const int rank_w = 10;
-const int pos_w = 30;
-const int task_w = 80;
+const int ID_W = 5;
+const int NAME_W = 20;
+const int DEPT_W = 15;
+const int RANK_W = 10;
+const int POS_W = 30;
+const int TASK_W = 70;
 
 class PersonnelManagement {
  private:
@@ -25,22 +25,22 @@ class PersonnelManagement {
     void importPersonnel();
     void exportPersonnel();
 
-    // input of these functions should be the rank
     void addPersonnel(std::string rank);
     bool removePersonnel(std::string rank);
     bool updatePersonnel(std::string rank);
-    void printPersonnel(std::string rank);  // List all personnel in the system
+    void listPersonnel(std::string rank);  // List all personnel in the system
 
     bool searchPersonnel(std::string rank); // Search for a personnel by name, ID, etc.
-                                                // by using Hash Table or Binary Search Tree
+                                            // by using Hash Table or Binary Search Tree
 
     void assignTask(std::string rank);      // Assign task to personnel
-    void listTask();                            // List all tasks in the system
+    void listTask();                        // List all tasks in the system
 
-    // void reportByUser(int ID);               // Report by user when they want to
-                                                // change salary, work hour, etc.
+    // void reportByUser(int ID);           // Report by user when they want to
+                                            // change salary, work hour, etc.
 
  public:
+    friend class ExpenseManagement;
     struct Personnel {
         int ID;
         std::string name;
@@ -72,8 +72,8 @@ class PersonnelManagement {
         friend std::ostream& operator << (std::ostream& os, const Personnel& p)
         {
             os << std::left << std::setfill(' ');
-            os << std::setw(id_w) << p.ID << std::setw(name_w) << p.name << std::setw(dept_w) << p.department
-                << std::setw(rank_w) << p.rank << std::setw(pos_w) << p.position << std::setw(task_w) << p.task;
+            os << std::setw(ID_W) << p.ID << std::setw(NAME_W) << p.name << std::setw(DEPT_W) << p.department
+                << std::setw(RANK_W) << p.rank << std::setw(POS_W) << p.position << std::setw(TASK_W) << p.task;
             return os;
         }
     };
