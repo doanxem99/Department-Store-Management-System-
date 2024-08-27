@@ -106,6 +106,7 @@ void PersonnelManagement::addPersonnel(std::string rank)
         }
         std::cout << "- Position: ";
         getline(std::cin, p.position);
+        p.currency = "USD";
 
         p.ID = first_unused_ID();
         ID_in_use[p.ID] = true;
@@ -163,7 +164,7 @@ bool PersonnelManagement::updatePersonnel(std::string rank)
             std::cout << "\n- Position: " << p.position << "\n\n";
             
             std::string answer;
-            std::cout << "Update this personnel's information (enter \"keep\" if there's no changes):";
+            std::cout << "Update this personnel's information (enter \"keep\" if there's no changes):\n";
             std::cout << "- Name: ";
             getline(std::cin, answer);
             if (answer != "keep")
@@ -206,17 +207,17 @@ bool PersonnelManagement::updatePersonnel(std::string rank)
     }
 }
 
-void PersonnelManagement::printPersonnel(std::string rank)
+void PersonnelManagement::listPersonnel(std::string rank)
 {
     if (rank != "Staff")
     {
         std::cout << "\n\t\t\t\tLIST OF PERSONNELS\n\n";
-        int w = id_w + name_w + dept_w + rank_w + pos_w + task_w;
+        int w = ID_W + NAME_W + DEPT_W + RANK_W + POS_W + TASK_W;
 
         std::cout << std::right << std::setw(w) << std::setfill('=') << '\n';
         std::cout << std::left << std::setfill(' ');
-        std::cout << std::setw(id_w) << "ID" << std::setw(name_w) << "NAME" << std::setw(dept_w) << "DEPARTMENT"
-                << std::setw(rank_w) << "RANK" << std::setw(pos_w) << "POSITION" << std::setw(task_w) << "TASK" << '\n';
+        std::cout << std::setw(ID_W) << "ID" << std::setw(NAME_W) << "NAME" << std::setw(DEPT_W) << "DEPARTMENT"
+                << std::setw(RANK_W) << "RANK" << std::setw(POS_W) << "POSITION" << std::setw(TASK_W) << "TASK" << '\n';
         std::cout << std::right << std::setw(w) << std::setfill('-') << '\n';
 
         Asset::personnelTree.print();
@@ -302,10 +303,10 @@ void PersonnelManagement::listTask()
     {
         std::cout << "\n\t\t\tLIST OF TASKS\n\n";
 
-        int w = rank_w + pos_w + task_w;
+        int w = RANK_W + POS_W + TASK_W;
         std::cout << std::right << std::setw(w) << std::setfill('=') << '\n';
         std::cout << std::left << std::setfill(' ');
-        std::cout << std::setw(rank_w) << "RANK" << std::setw(pos_w) << "POSITION" << std::setw(task_w) << "TASK" << '\n';
+        std::cout << std::setw(RANK_W) << "RANK" << std::setw(POS_W) << "POSITION" << std::setw(TASK_W) << "TASK (in general)" << '\n';
         std::cout << std::right << std::setw(w) << std::setfill('-') << '\n';
         
         std::cout << std::left << std::setfill(' ');
@@ -315,7 +316,7 @@ void PersonnelManagement::listTask()
             getline(fin, rank, ',');
             getline(fin, position, ',');
             getline(fin, task);
-            std::cout << std::setw(rank_w) << rank << std::setw(pos_w) << position << std::setw(task_w) << task << '\n';
+            std::cout << std::setw(RANK_W) << rank << std::setw(POS_W) << position << std::setw(TASK_W) << task << '\n';
         }
 
         std::cout << std::right << std::setw(w) << std::setfill('=') << '\n';
@@ -357,7 +358,7 @@ void PersonnelManagement::stepbystepForPersonnelManagement(int ID, std::string r
         else if (choice == 3)
             is_successful = updatePersonnel(rank);
         else if (choice == 4)
-            printPersonnel(rank);
+            listPersonnel(rank);
         else if (choice == 5)
             is_successful = searchPersonnel(rank);
         else if (choice == 6)
