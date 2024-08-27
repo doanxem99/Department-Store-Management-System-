@@ -1,9 +1,9 @@
-Owner,Store owner,Own the store, I guess?
-Manager,Inventory manager,Managing the process of ordering, storing and using inventory
+Owner,Store owner,Creating a business plan and strategy
+Manager,Inventory manager,Overseeing team of inventory or warehouse employees
 Manager,Personnel manager,Hiring, training and managing employees
 Manager,Expense manager,Overseeing and optimizing expenditures
 Staff,Cashier,Handling customer transactions
-Staff,Accoutant,Don't get arrested
+Staff,Accoutant,Keeping and examines the records
 Staff,Inventory auditor,Monitoring and verifying the inventory records
-Staff,Janitor,Cleaning store
+Staff,Janitor,Cleaning the store
 Staff,Security,Daytime security, nighttime security
