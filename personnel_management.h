@@ -8,8 +8,8 @@
 #include <string>
 
 #include "./asset.h"
-#include "./ds.h"
 
+const int MAX_PERSONNELS = 50;  // Assuming that the number of personnels won't exceed 50
 const int ID_W = 5;
 const int NAME_W = 20;
 const int DEPT_W = 15;
@@ -19,7 +19,7 @@ const int TASK_W = 70;
 
 class PersonnelManagement {
  private:
-    static bool ID_in_use[50];  // Assuming that the number of personnels won't exceed 50
+    static bool ID_in_use[MAX_PERSONNELS];
     
     int first_unused_ID();      // "Generate" ID for new personnel
     void importPersonnel();
