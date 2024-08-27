@@ -1,3 +1,3 @@
 0|John|231 street A, district B|097854|johnny855@gmail.com|Personnel|Owner|Owner|Own the store|1000|USD|
-1|Kris|987 street C|09523|kris254@gmail.com|Expense|Manager|Expense manager|Managing expense|-1||
-2|Jenny|124 street 5|251261|jenny@gmail.com|Personnel|Manager|Personnel manager|Training personnel|-1||
+1|Kris|987 street C|09523|kris254@gmail.com|Expense|Manager|Expense manager|Managing expense|-1|USD|
+2|Jenny|124 street 5|251261|jenny@gmail.com|Personnel|Manager|Personnel manager|Training personnel|-1|USD|
