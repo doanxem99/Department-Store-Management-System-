@@ -361,6 +361,12 @@ void category_insert(Category *c, const std::string &name, const std::vector<std
 			iter = cate_new;
 		}
 	}
+
+	for (const std::string &cate_name: iter->list) {
+		if (cate_name == name) {
+			return;
+		}
+	}
 	iter->list.push_back(name);
 }
 
@@ -405,8 +411,8 @@ void ProductManagement::importProduct(const std::string &infile) {
 		unsigned int expirationDate = 0;
 		size_t iter_count = 0;
 		ifs >> expirationDate >> iter_count;
-		Product prod;
 		while (iter_count-- > 0) {
+			Product prod;
 			ifs >> prod.id >> prod.entryPrice >> prod.sellingPrice >> prod.quantity;
 			ifs.ignore(2);
 			std::getline(ifs, prod.name);
@@ -493,7 +499,7 @@ void ProductManagement::addProduct(const std::string &name, size_t id, float ent
 				}, expirationDate);
 }
 
-void ProductManagement::addProduct(unsigned int expirationDate, const Product &prod) {
+void ProductManagement::addProduct(unsigned int expirationDate, Product prod) {
 	if (prod.category.size() == 0) {
 		prod.category.push_back("Uncategorized");
 	}
@@ -542,14 +548,19 @@ void product_push_back(Node *node, std::vector<Product*> &list) {
 
 void merge(std::vector<Product*> &list, size_t l, size_t m, size_t r, Product **L, Product **R)
 {
+	if (l >= list.size() || r >= list.size()) {
+		return;
+	}
+
     size_t n1 = m - l + 1;
     size_t n2 = r - m;
 
     for (size_t i = 0; i < n1; i++) {
         L[i] = list[l + i];
     }
-    for (size_t i = 0; i < n2; i++)
+    for (size_t i = 0; i < n2; i++) {
         R[i] = list[m + 1 + i];
+    }
 
     size_t i = 0, j = 0, k = l;
     while (i < n1 && j < n2) {
@@ -587,7 +598,7 @@ void ProductManagement::sortProduct(std::vector<Product*> &list) {
     Product **R = new Product*[list.size()/2];
 	size_t step = 1;
 	while (step <= idx.size()/2) {
-		for (size_t i = 0; i < idx.size() - step*(i+2); i += step*2) {
+		for (size_t i = 0; idx.size() >= step*(i+2) && i < idx.size() - step*(i+2); i += step*2) {
 			merge(list, idx[step*i], idx[step*(i+1)], idx[step*(i+2)], L, R);
 		}
 		step *= 2;
@@ -684,7 +695,8 @@ bool ProductManagement::listOutOfStockProduct() {
 }
 
 void ProductManagement::stepbystepForProductManagement() {
-	while (true) {
+    int choice = 0;
+	do {
 		std::cout << "\t\t\tPRODUCT MANAGEMENT\n";
 	    std::cout << "1. Add a product\n";
 	    std::cout << "2. Remove a product\n";
@@ -696,11 +708,10 @@ void ProductManagement::stepbystepForProductManagement() {
 	    std::cout << "8. Search for a product\n";
 	    std::cout << "9. Exit\n\n";
 
-	    int choice = 0;
 	    do {
 	    	std::cout << "Your choice: ";
 	    	std::cin >> choice;
-	    } while (choice < 1 || choice > 8);
+	    } while (choice < 1 || choice > 9);
 
 	    if (choice == 1) {
 	    	Product prod;
@@ -713,11 +724,11 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	std::cin >> prod.entryPrice;
 	    	std::cout << "Quantity: ";
 	    	std::cin >> prod.quantity;
-	    	std::cout << "Expiration date: ";
+	    	std::cout << "Expiration date (format yyyymmdd): ";
 	    	unsigned int expirationDate = 0;
 	    	std::cin >> expirationDate;
 	    	std::string line;
-	    	std::cout << "Selling price (press ENTER to set default is " << prod.entryPrice << ")\n";
+	    	std::cout << "Selling price (press ENTER to set default is " << prod.entryPrice*1.5f << ")\n";
 	    	std::cin.ignore();
     		std::getline(std::cin, line);
     		if (line.size() == 0) {
@@ -826,10 +837,10 @@ void ProductManagement::stepbystepForProductManagement() {
 	    	sortProduct(list);
 	    	for (const Product* prod: list) {
 	    		std::cout << prod->name << "(" << prod->id << "), quantity: " << prod->quantity << ", category: [";
-	    		for (const std::string &category: prod->category) {
-	    			std::cout << category << ",";
+	    		for (size_t i = 0; i < prod->category.size() - 1; i++) {
+	    			std::cout << prod->category[i] << ", ";
 	    		}
-	    		std::cout << "]\n";
+	    		std::cout << prod->category.back() << "]\n";
 	    	}
 	    }
 	    else if (choice == 6) {
@@ -851,7 +862,6 @@ void ProductManagement::stepbystepForProductManagement() {
 	    		}
 	    	}
 
-	    	std::cin.ignore();
 	    	std::string line;
 	    	std::cout << "Range start (format yyyymmdd or leave empty to search from beginning): ";
 	    	unsigned int range_start = 0;
@@ -872,24 +882,31 @@ void ProductManagement::stepbystepForProductManagement() {
 	    		range_end = atoi(line.c_str());
 	    	}
 
-	    	bool exists = false;
+	    	Product *prod = nullptr;
 	    	if (is_number) {
 	    		size_t num = std::atoll(info.c_str());
-	    		exists = nlist_get(nl0, num, range_end, range_start);
+	    		prod = nlist_get(nl0, num, range_end, range_start);
 	    	}
 	    	else {
-	    		exists = nlist_get_from_name(nl0, info, range_end, range_start);
+	    		prod = nlist_get_from_name(nl0, info, range_end, range_start);
 	    	}
 
-	    	if (exists) {
-	    		std::cout << "Found\n";
+	    	if (prod != nullptr) {
+	    		std::cout << "Name: " << prod->name << "\n";
+	    		std::cout << "Id: " << prod->id << "\n";
+	    		std::cout << "Quantity: " << prod->quantity << "\n";
+	    		std::cout << "Entry price: " << prod->entryPrice << " " << prod->currency << "\n";
+	    		std::cout << "Selling price: " << prod->sellingPrice << " " << prod->currency << "\n";
+	    		std::cout << "Category: ";
+	    		for (size_t i = 0; i < prod->category.size() - 1; i++) {
+	    			std::cout << prod->category[i] << ", ";
+	    		}
+	    		std::cout << prod->category.back() << "\n";
+	    		std::cout << "Supplier: " << prod->supplier << "\n";
 	    	}
 	    	else {
 	    		std::cout << "Not found\n";
 	    	}
 	    }
-	    else if (choice == 9) {
-	    	break;
-	    }
-	}
+	} while (choice != 9);
 }

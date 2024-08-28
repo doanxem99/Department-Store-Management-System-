@@ -88,13 +88,6 @@ class ProductManagement {
 
     bool listOutOfStockProduct();   			// List all out-of-stock
                                     			// products in the system
-
-    // void ongoingOrder();    // List all ongoing orders in the system
-
-    // void completedOrder();  // List all completed orders in the system
-
-    // void reportByUser();    // Report by user when they want to
-                            // annouce something about the product
     // Step-by-step for product management when user choose this option
     void stepbystepForProductManagement();
 
